@@ -6,6 +6,8 @@ intervals = {
             bt.TimeFrame.Weeks: '1wk',
             bt.TimeFrame.Months: '1mo',
         }
+
+This file is used to fetch data from yahoo.finance site and store it in cache in csv format
 """
 import requests
 import os
@@ -55,7 +57,7 @@ class YahooFinanceData:
             
             # find in cache first
             if os.path.isfile(file_path):
-                # print('{} found in cache'.format(dname))
+                print('{} found in cache'.format(dname))
                 
                 with open(file_path) as f:
                     stock_data = f.read()
@@ -93,7 +95,7 @@ class YahooFinanceData:
 
             if crumb is None:
                 error = 'crumb not found'
-                # print('{} {}'.format(dname, error))
+                print('{} {}'.format(dname, error))
                 stock_data = None
                 continue
 
@@ -119,17 +121,17 @@ class YahooFinanceData:
                 break
 
             if error:
-                # print('{} {}'.format(dname, error))
+                print('{} {}'.format(dname, error))
                 continue
         
-            # print('{} downloaded and stored in cache'.format(dname))
+            print('{} downloaded and stored in cache'.format(dname))
             with open(file_path, 'w') as f:
                 f.write(stock_data)
             
             required.remove(dname)
         
         if len(required):
-            raise ValueError("Not all stockes are downloaded")
+            raise ValueError("Not all stockes are downloaded, Run again until I am disappeared")
 
         self._update()
 

@@ -1,3 +1,11 @@
+"""
+This is powerful engine which helps in picturising the nobel prize winning theory of Markowitz
+and can prove extensively useful in the field of financial engineering when it comes to do the
+portfolio optimisation for modern stocks. 
+Signed off: Hiren Chalodiya <chalodiya.1@iitj.ac.in>
+            Mayank Raj <raj.6@iitj.ac.in>
+"""
+
 import numpy as np
 import cvxpy as cp
 from utils import solvePortfolio
@@ -50,8 +58,8 @@ class MarkowitzBullet:
 
     def prepare(self):
         mu_range = np.arange( self.mu_min, self.mu_max, self.mu_gap)  # mu_range : mu range
+        # optimized sigma generator
         sg = lambda mu: cp.quad_form(self.solveSubProblem(mu), self.CM).value  # sg : sigma generator
-        # sg = lambda mu: cp.quad_form(solvePortfolio(self.CM, self.MM, mu), self.CM).value
 
         mu = []
         sigma = []
@@ -99,17 +107,11 @@ class MarkowitzBullet:
         return lambda1 + lambda2
 
     def plot(self, ax):
-        # x axis
-        # ax.axhline(color='#000000')
-
-        # y axis
-        # ax.axvline(color='#000000')
-
         # Bullet line
         ax.plot(self.line_var, self.line_mean, label='μ vs σ : Markowitz bullet')
 
         # Market  point
-        ax.plot(self.risk, self.ret, label='Min σ for given μ', marker="o")
+        ax.plot(self.risk, self.ret, label='Optimal point for given μ', marker="o")
 
         # Lowest point
         ax.plot(self.risk_min, self.ret_min, marker="o")
