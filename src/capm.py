@@ -97,6 +97,12 @@ class CAPM:
         return np.array(wr.value), np.array(wrf.value)
 
     def plot(self, ax):
+        # x axis
+        ax.axhline(color='#000000')
+
+        # y axis
+        ax.axvline(color='#000000')
+
         # Bullet line
         ax.plot(self.line_var, self.line_mean, label='μ vs σ : Markowitz bullet')
 

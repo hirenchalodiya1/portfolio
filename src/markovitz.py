@@ -75,10 +75,16 @@ class MarkowitzBullet:
         self.ret = self.EM
 
     def plot(self, ax):
+        # x axis
+        ax.axhline(color='#000000')
+
+        # y axis
+        ax.axvline(color='#000000')
+
         # Bullet line
         ax.plot(self.line_var, self.line_mean, label='μ vs σ : Markowitz bullet')
 
-        # Market  point        
+        # Market  point
         ax.plot(self.risk, self.ret, label='Min σ for given μ', marker="o")
 
         # Lowest point
