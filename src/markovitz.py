@@ -1,5 +1,6 @@
 import numpy as np
 import cvxpy as cp
+from utils import solvePortfolio
 
 
 class MarkowitzBullet:
@@ -37,7 +38,7 @@ class MarkowitzBullet:
 
     def prepare(self):
         mu_range = np.arange( self.mu_min, self.mu_max, self.mu_gap)  # mu_range : mu range
-        sg = lambda mu: cp.quad_form(self.solveSub(mu), self.CM).value  # sg : sigma generator
+        sg = lambda mu: cp.quad_form(solvePortfolio(self.CM, self.MM, mu), self.CM).value  # sg : sigma generator
 
         mu = []
         sigma = []
@@ -61,7 +62,7 @@ class MarkowitzBullet:
         self.line_var = np.array(sigma)
 
         # minimum variable
-        self.w_min = self.solveSub()
+        self.w_min = solvePortfolio(self.CM, self.MM)
         self.risk_min = cp.quad_form(self.w_min, self.CM).value
         self.ret_min = (self.MM @ self.w_min.T)
 
@@ -69,25 +70,9 @@ class MarkowitzBullet:
         if not self.mu_min <= self.EM <= self.mu_max:
             raise ValueError('Return is not in range')
 
-        self.w = self.solveSub(self.EM)
+        self.w = solvePortfolio(self.CM, self.MM, self.EM)
         self.risk = cp.quad_form(self.w, self.CM).value
         self.ret = self.EM
-
-    def solveSub(self, EM=None):
-        w = cp.Variable(self.n)
-        risk = cp.quad_form(w, self.CM)
-        conditions = [
-            sum(w) == 1,
-            self.MM @ w.T == EM
-        ]
-        if EM is None:
-            conditions = [
-                sum(w) == 1
-            ]
-        
-        prob = cp.Problem(cp.Minimize(risk), conditions)
-        prob.solve()
-        return np.array(w.value)
 
     def plot(self, ax):
         # Bullet line
