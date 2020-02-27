@@ -9,6 +9,7 @@ requests = "*"
 pandas = "*"
 numpy = "*"
 cvxpy = "*"
+quandl = "*"
 
 [dev-packages]
 

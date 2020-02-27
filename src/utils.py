@@ -27,7 +27,8 @@ def mean_and_cov_matrix(data):
         
     M = np.array(M)
     C = np.array(C)
-
+    print(M)
+    print(C)
     return  M, C
 
 

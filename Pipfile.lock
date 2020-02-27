@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a3dba4b7a254bb1b94b13cb33f78eebf9c770837a8742d231e039485ddd24170"
+            "sha256": "bc0f375e41cf0043e8133c1bde58df6868aed87dc29c6c0cf6bc19116142a769"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -97,6 +97,12 @@
             ],
             "version": "==2.9"
         },
+        "inflection": {
+            "hashes": [
+                "sha256:18ea7fb7a7d152853386523def08736aa8c32636b047ade55f7578c4edeb16ca"
+            ],
+            "version": "==0.3.1"
+        },
         "kiwisolver": {
             "hashes": [
                 "sha256:05b5b061e09f60f56244adc885c4a7867da25ca387376b02c1efc29cc16bcd0f",
@@ -158,6 +164,13 @@
             ],
             "index": "pypi",
             "version": "==3.1.3"
+        },
+        "more-itertools": {
+            "hashes": [
+                "sha256:5dd8bcf33e5f9513ffa06d5ad33d78f31e1931ac9a18f33d37e77a180d393a7c",
+                "sha256:b1ddb932186d8a6ac451e1d95844b382f55e12686d51ca0c68b6f61f2ab7a507"
+            ],
+            "version": "==8.2.0"
         },
         "multiprocess": {
             "hashes": [
@@ -275,6 +288,14 @@
                 "sha256:b02c06db6cf09c12dd25137e563b31700d3b80fcc4ad23abb7a315f2789819be"
             ],
             "version": "==2019.3"
+        },
+        "quandl": {
+            "hashes": [
+                "sha256:c288492b4d28d97d6b9924d48f654e01437ffab6874ce30ee37665981455b8d0",
+                "sha256:c3a9fc5ec1b585eeacd97531454e7795dde7a072c057f21335e5918cb905fc7e"
+            ],
+            "index": "pypi",
+            "version": "==3.5.0"
         },
         "requests": {
             "hashes": [

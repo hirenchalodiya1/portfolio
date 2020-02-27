@@ -38,63 +38,22 @@ class CAPM:
         self.prepare()
 
     def prepare(self):
-        mu_range = np.arange( self.mu_min, self.mu_max, self.mu_gap)  # mu_range : mu range
-        wg = lambda mu: self.solveSub(mu)[0] # wg : wrisky generator
-        sg = lambda w: cp.quad_form(w, self.CM).value  # sg : sigma generator
-        mg = lambda w: (self.MM @ w.T)
+        identity = [1]*self.n
+        O = np.array(identity)
+        CI = np.linalg.inv(self.CM)
 
-        mu = []
-        sigma = []
+        self.w_risky = ((self.MM - self.RR * O) @ CI ) / ((self.MM - self.RR * O) @ CI @ O.T)
         
-        for m in mu_range:
-            try:
-                w = wg(m)
-                sigma.append(sg(w))
-                mu.append(mg(w))
-            except cp.error.DCPError:
-                pass
+        self.ret_der = ( self.MM @ self.w_risky.T )
+        self.risk_der = cp.quad_form(self.w_risky, self.CM).value
 
-        if not len(mu):
-            raise ValueError('Data are not proper')
-
-        self.mu_min = max(self.mu_min, mu[0])
-        self.mu_max = min(self.mu_max, mu[-1])
-
-        # variance and mean line
-        self.line_mean = np.array(mu)
-        self.line_var = np.array(sigma)
-
-        # minimum variable
-        self.w_min, self.wr_min = self.solveSub()
-        self.risk_min = cp.quad_form(self.w_min, self.CM).value
-        self.ret_min = (self.MM @ self.w_min.T) + self.RR * self.wr_min
-
-        # Solve problem
-        if not self.mu_min <= self.EM <= self.mu_max:
-            raise ValueError('Return is not in range')
-
-        self.w, self.wr = self.solveSub(self.EM)
-        self.risk = cp.quad_form(self.w, self.CM).value
-        self.ret = self.EM + + self.RR * self.wr
-
-    def solveSub(self, EM=None):
-        wr = cp.Variable(self.n) # w risky
-        wrf = cp.Variable(1) # w risk-free
-
-        risk = cp.quad_form(wr, self.CM)
-        conditions = [
-            sum(wr + wrf) == 1,
-            self.MM @ wr.T + self.RR * wrf == EM
-        ]
-        if EM is None:
-            conditions = [
-                sum(wr + wrf) == 1
-            ]
-        
-        prob = cp.Problem(cp.Minimize(risk), conditions)
-        prob.solve()
-        # print(np.array(wr.value), np.array(wrf.value))
-        return np.array(wr.value), np.array(wrf.value)
+        # capm line
+        slope = ( self.ret_der - self.RR ) / ( self.risk_der )
+        line_eqn = lambda x: (slope * x + self.RR)
+        self.capm_risk = np.arange( 0, self.risk_der*2, 0.000001)
+        self.capm_ret = np.array([line_eqn(x) for x in self.capm_risk])
+        # print(self.capm_risk)
+        # print(self.capm_ret)
 
     def plot(self, ax):
         # x axis
@@ -103,17 +62,14 @@ class CAPM:
         # y axis
         ax.axvline(color='#000000')
 
-        # Bullet line
-        ax.plot(self.line_var, self.line_mean, label='μ vs σ : Markowitz bullet')
+        # Risk free point
+        ax.plot(0, self.RR, label='Risk free point', marker='o')
 
-        # Market  point        
-        ax.plot(self.risk, self.ret, label='Min σ for given μ', marker="o")
+        # Market point
+        ax.plot(self.risk_der, self.ret_der, label='Market point', marker='o')
 
-        # Lowest point
-        ax.plot(self.risk_min, self.ret_min, marker="o")
-
-        # Fill frontier
-        ax.fill_between(self.line_var, self.ret_min, self.line_mean, where=self.line_mean >= self.ret_min,  color='#8FE388', label='Efficient frontier')
+        # CAPM line
+        ax.plot(self.capm_risk, self.capm_ret, label='CAPM line')
 
         # Add a title
         ax.set_title('Capital assets pricing model')

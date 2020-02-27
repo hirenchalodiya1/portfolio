@@ -31,21 +31,34 @@ class MarkowitzBullet:
         # Curve properties
         self.mu_min = kwargs.get('mu_min', 0.00)
         self.mu_max = kwargs.get('mu_max', 0.50)
-        self.mu_gap = kwargs.get('mu_gap', 0.005)
+        self.mu_gap = kwargs.get('mu_gap', 0.1)
+
+        # Prepare war material
+        identity = [1]*self.n
+        self.CI = np.linalg.inv(self.CM)  # C inverse
+        self.O = np.array(identity)
+
+        self._a = ( ( self.CI @ self.O.T ) * ( self.MM @ self.CI @ self.MM.T ) )
+        self._b = ( ( self.CI @ self.O.T ) * ( self.O @ self.CI @ self.MM.T ) )
+        self._c = ( self.O @ self.CI @ self.O.T * self.MM @ self.CI @ self.MM.T ) # scalar
+        self._d = ( self.MM @ self.CI @ self.O.T * self.O @ self.CI @ self.MM.T ) # scalar
+        self._e = ( ( self.CI @ self.MM.T ) * ( self.O @ self.CI @ self.O.T ) )
+        self._f = ( ( self.CI @ self.MM.T ) * ( self.MM @ self.CI @ self.O.T ) )
         
         # Prepate lines
         self.prepare()
 
     def prepare(self):
         mu_range = np.arange( self.mu_min, self.mu_max, self.mu_gap)  # mu_range : mu range
-        sg = lambda mu: cp.quad_form(solvePortfolio(self.CM, self.MM, mu), self.CM).value  # sg : sigma generator
+        sg = lambda mu: cp.quad_form(self.solveSubProblem(mu), self.CM).value  # sg : sigma generator
+        # sg = lambda mu: cp.quad_form(solvePortfolio(self.CM, self.MM, mu), self.CM).value
 
         mu = []
         sigma = []
         
         for m in mu_range:
             try:
-                s = sg(m)
+                s = np.sqrt(sg(m))
                 sigma.append(s)
                 mu.append(m)
             except cp.error.DCPError:
@@ -63,23 +76,34 @@ class MarkowitzBullet:
 
         # minimum variable
         self.w_min = solvePortfolio(self.CM, self.MM)
-        self.risk_min = cp.quad_form(self.w_min, self.CM).value
+        self.risk_min = np.sqrt(cp.quad_form(self.w_min, self.CM).value)
         self.ret_min = (self.MM @ self.w_min.T)
 
         # Solve problem
         if not self.mu_min <= self.EM <= self.mu_max:
             raise ValueError('Return is not in range')
 
-        self.w = solvePortfolio(self.CM, self.MM, self.EM)
-        self.risk = cp.quad_form(self.w, self.CM).value
+        self.w = self.solveSubProblem(self.EM)
+        self.risk = np.sqrt(cp.quad_form(self.w, self.CM).value)
         self.ret = self.EM
+
+    def solveSubProblem(self, EM):
+        """
+        λ1 = ( a - μ * b ) / ( c - d )
+        λ2 = ( μ * e - f ) / ( c - d )
+        w = λ1 + λ2
+        """
+        deno = self._c - self._d
+        lambda1 = (self._a - EM * self._b) / deno
+        lambda2 = (EM * self._e - self._f) / deno
+        return lambda1 + lambda2
 
     def plot(self, ax):
         # x axis
-        ax.axhline(color='#000000')
+        # ax.axhline(color='#000000')
 
         # y axis
-        ax.axvline(color='#000000')
+        # ax.axvline(color='#000000')
 
         # Bullet line
         ax.plot(self.line_var, self.line_mean, label='μ vs σ : Markowitz bullet')
