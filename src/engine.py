@@ -31,11 +31,11 @@ class PyfolioEngine:
         if kwargs.get('cap_mu_gap'): cap['mu_gap'] = kwargs.get('cap_mu_gap')
         # self.capm = CAPM(self.ret_matrix, self.cov_matrix, expected_mean, risk_free_return, **cap)
 
-        # keys = data.keys()
-        # ws = self.marko.w
-        print(self.marko.w)
-        # for id_, k in enumerate(zip(keys, ws)):
-            # print('{} :{} --> {:.6f}'.format(id_+1, k[0][1], k[1]))
+        keys = data.keys()
+        ws = self.marko.w
+        # print(self.marko.w)
+        for id_, k in enumerate(zip(keys, ws)):
+            print('{} :{} --> {:.6f}'.format(id_+1, k[0], k[1]))
 
     def plot(self):
         # Figure

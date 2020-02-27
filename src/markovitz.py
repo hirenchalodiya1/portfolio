@@ -31,7 +31,7 @@ class MarkowitzBullet:
         # Curve properties
         self.mu_min = kwargs.get('mu_min', 0.00)
         self.mu_max = kwargs.get('mu_max', 0.50)
-        self.mu_gap = kwargs.get('mu_gap', 0.1)
+        self.mu_gap = kwargs.get('mu_gap', 0.05)
 
         # Prepare war material
         identity = [1]*self.n

@@ -1,13 +1,16 @@
 from yahoo import YahooFinanceData
 from datetime import datetime
 from engine import PyfolioEngine
-import quandl
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 stock_code = [
     'MSFT', # Microsoft
     'RS', # Reliance
     'GOOGL', # Google
+    # 'GOOG',
     'AAPL', #Apple
     'AMZN', #Amazon
     'TSLA', #Tesla
@@ -33,8 +36,16 @@ stock_code = [
     # 'UBER', #uber
     # 'NTNX', # nutanix
     'MA',  # mastercard
-    
-    # 'BA'   
+    'TCS.NS',
+    # 'WIPRO.NS',
+    # 'CRISIL.BO',
+    # 'LAOPALA.BO',
+    # 'BOSCHLTD.NS'
+    'SQ',
+    'CODX',
+    'TDOC',
+    'IBIO',
+    'PYPL'
 
 ]
 new_stocks = [
@@ -66,19 +77,7 @@ new_stocks = [
 ]
 
 if __name__ == "__main__":
-    # Fetch data
-    # data = YahooFinanceData(new_stocks, fromdate=datetime(2016, 12, 1), todate=datetime(2016, 12, 31))
-    # data.prepare()
-    quandl.ApiConfig.api_key = 'NMgz64DRkZaB-kfxENfJ'
-    data = quandl.get_table('WIKI/PRICES', ticker = stock_code,
-                        qopts = { 'columns': ['date', 'ticker', 'adj_close'] },
-                        date = { 'gte': '2016-12-1', 'lte': '2016-12-31' }, paginate=True)
-
-    # reorganise data pulled by setting date as index with
-    # columns of tickers and their corresponding adjusted prices
-    clean = data.set_index('date')
-    table = clean.pivot(columns='ticker')
-
-    # Let engine handlw rest of it !!
-    engine = PyfolioEngine(table, 0.05, 0.0, marko_mu_max=5, marko_mu_min=-1, marko_mu_gap=0.1)
+    data = YahooFinanceData(stock_code, fromdate=datetime(2019, 1, 1), todate=datetime(2020, 1, 1))
+    data.prepare()
+    engine = PyfolioEngine(data.data, 0.9, 0.0633, marko_mu_max=2, marko_mu_min=-0.3, marko_mu_gap=0.02)
     engine.plot()

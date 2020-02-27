@@ -55,7 +55,7 @@ class YahooFinanceData:
             
             # find in cache first
             if os.path.isfile(file_path):
-                print('{} found in cache'.format(dname))
+                # print('{} found in cache'.format(dname))
                 
                 with open(file_path) as f:
                     stock_data = f.read()
@@ -93,7 +93,7 @@ class YahooFinanceData:
 
             if crumb is None:
                 error = 'crumb not found'
-                print('{} {}'.format(dname, error))
+                # print('{} {}'.format(dname, error))
                 stock_data = None
                 continue
 
@@ -119,10 +119,10 @@ class YahooFinanceData:
                 break
 
             if error:
-                print('{} {}'.format(dname, error))
+                # print('{} {}'.format(dname, error))
                 continue
         
-            print('{} downloaded and stored in cache'.format(dname))
+            # print('{} downloaded and stored in cache'.format(dname))
             with open(file_path, 'w') as f:
                 f.write(stock_data)
             
@@ -134,8 +134,8 @@ class YahooFinanceData:
         self._update()
 
     def _update(self):
-        # ret = pd.Data
         for dname in self.dataname:
             file_name = '{}_{}_{}_{}.csv'.format(dname, self.period1, self.period2, self.interval)
             file_path = os.path.join(CSV_CACHE_FOLDER, file_name)
             self.data[dname] = pd.read_csv(file_path)['Close']
+        self.data = pd.DataFrame.from_dict(self.data)
