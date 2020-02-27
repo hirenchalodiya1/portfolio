@@ -7,38 +7,34 @@ stock_code = [
     'MSFT', # Microsoft
     'RS', # Reliance
     'GOOGL', # Google
-    'HEROMOTOCO.NS',
-    'KOTAKBANK.NS',
-    'ICICIBANK.NS',
-    'IDEA.NS',
-    'YESBANK.NS',
-    'TATAPOWER.NS',
-    'ONGC.NS',
-    'ITC.NS',
-    'AXISBANK.NS',
     'AAPL',
     'AMZN',
     'TSLA',
     'NFLX',
     'FB',
     'GS',
-    # 'JPM',
+    'JPM',
     'MS',
-    # 'TTM',
-    'TCS.NS',
-    "MARUTI.NS",
+    'TTM',
     'V',
     'TXN',
-    # 'GE',
-    # 'UNH',
-    'OIL.NS',
-    # '2222.SR',
-    'HINDUNILVR.NS'
+    'GE',
+    'UNH',
+    'GM',
+    'F',
+    'KO',
+    'JNJ',
+    'PEP',
+    'PG',
+    'DIS',
+    'WMT',
+    'CL'
+
 ]
 # Fetch data
 data = YahooFinanceData(stock_code, fromdate=datetime(2019, 9, 1), todate=datetime(2020, 2, 1))
 data.prepare()
 
 # Let engine handlw rest of it !!
-engine = PyfolioEngine(data.data, 0.20, 0.05, marko_mu_max=0.35)
+engine = PyfolioEngine(data.data, 0.20, 0.0633, marko_mu_max=0.35)
 engine.plot()
