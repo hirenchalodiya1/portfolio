@@ -1,5 +1,6 @@
 import numpy as np
 import cvxpy as cp
+import pandas as pd
 
 
 def mean_and_cov_matrix(data):
@@ -7,8 +8,15 @@ def mean_and_cov_matrix(data):
     M = []
     C = []
 
+    for key, value in data.items():
+        ret_matrix = []
+        zero_value = value[0]
+        for val in value:
+            ret_matrix.append((val-zero_value)/zero_value)
+        data[key] = pd.Series(ret_matrix)
+
     for key1, value1 in data.items():
-        Return = np.mean(value1)/value1[0] - 1
+        Return = np.mean(value1)
         M.append(Return)
 
         CL = []
