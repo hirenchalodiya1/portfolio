@@ -134,7 +134,7 @@ class YahooFinanceData:
         self._update()
 
     def _update(self):
-        ret = pd.Data
+        # ret = pd.Data
         for dname in self.dataname:
             file_name = '{}_{}_{}_{}.csv'.format(dname, self.period1, self.period2, self.interval)
             file_path = os.path.join(CSV_CACHE_FOLDER, file_name)

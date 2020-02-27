@@ -25,27 +25,49 @@ stock_code = [
     'DIS', # disney
     'WMT', #walmart
     'TXN', # texas instruments
-    'INFY', #infosys
+    # 'INFY', #infosys
     'HPE', # hewlet packard
     'IBM', #ibm
     'INTC', # intel
     'NVDA', #nvidia
-    'UBER', #uber
-    'NTNX', # nutanix
+    # 'UBER', #uber
+    # 'NTNX', # nutanix
     'MA',  # mastercard
-    # 'ADBE', #adbe
-    # 'CRM', #salesforce
-    'SAP', #saplabs
-    'WIT', #wipro
-    'TTM', #tatamotors
-    # 'VMW', #vmware
-    # 'CL'
+    
+    # 'BA'   
 
+]
+new_stocks = [
+    'AAPL',
+    'MSFT',
+    'AMZN',
+    'GOOGL',
+    'ADBE',
+    'ORCL',
+    'SAP',
+    'NVDA',
+    'CSCO',
+    'QCOM',
+    'VMW',
+    'HTHIY',
+    'CRM',
+    'IBM',
+    "CTSH",
+    'JPM',
+    'MA',
+    'AMD',
+    'INTC',
+    'MS',
+    'GS',
+    'WMT',
+    'AXP',
+    'BAC',
+    'C'
 ]
 
 if __name__ == "__main__":
     # Fetch data
-    # data = YahooFinanceData(stock_code, fromdate=datetime(2016, 12, 1), todate=datetime(2016, 12, 31))
+    # data = YahooFinanceData(new_stocks, fromdate=datetime(2016, 12, 1), todate=datetime(2016, 12, 31))
     # data.prepare()
     quandl.ApiConfig.api_key = 'NMgz64DRkZaB-kfxENfJ'
     data = quandl.get_table('WIKI/PRICES', ticker = stock_code,
@@ -58,5 +80,5 @@ if __name__ == "__main__":
     table = clean.pivot(columns='ticker')
 
     # Let engine handlw rest of it !!
-    engine = PyfolioEngine(table, 1.7, 0.0, marko_mu_max=5, marko_mu_min=-1, marko_mu_gap=0.1)
+    engine = PyfolioEngine(table, 0.05, 0.0, marko_mu_max=5, marko_mu_min=-1, marko_mu_gap=0.1)
     engine.plot()
