@@ -40,6 +40,12 @@ class CAPM:
         self.ret_der = None
         self.risk_der = None
 
+        # CAPM line
+        self.slope = None
+
+        # Compare point
+        self.com_point = kwargs.get('compare_point', 0.15)
+
         # Prepare lines
         self._prepare()
 
@@ -63,8 +69,11 @@ class CAPM:
 
         # Capital market line
         self.capm_risk = np.arange(0, self.risk_der * 1.5, 0.02)
-        slope = (self.ret_der - self.RR) / self.risk_der
-        self.capm_ret = (slope * self.capm_risk) + self.RR
+        self.slope = (self.ret_der - self.RR) / self.risk_der
+        self.capm_ret = (self.slope * self.capm_risk) + self.RR
+
+        # Comparison line
+        self.line_comp = [0, (self.slope * self.com_point + self.RR) * 1.5]
 
     def plot(self, ax):
         # x axis
@@ -84,6 +93,10 @@ class CAPM:
 
         # Capital Market point
         ax.plot(self.risk, self.ret, label="Capital Market point", marker='o')
+
+        # Comparision of risk
+        ax.plot([self.com_point, self.com_point], self.line_comp, color='#013220', linestyle='--',
+                label='Comparison line')
 
         # Add a title
         ax.set_title('Capital assets pricing model')
