@@ -32,7 +32,7 @@ def mean_and_cov_matrix(data):
             cov = value1.cov(value2)
             CL.append(cov)
         C.append(CL)
-        
+
     M = np.array(M)
     C = np.array(C)
 
@@ -51,7 +51,7 @@ def solvePortfolio(cov_matrix, mean_matrix, expected_mean=None):
         conditions = [
             sum(w) == 1
         ]
-    
+
     prob = cp.Problem(cp.Minimize(risk), conditions)
     prob.solve()
     return w.value
