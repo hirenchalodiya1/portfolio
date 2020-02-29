@@ -62,10 +62,28 @@ class PyfolioEngine:
         # Show plot
         plt.show()
 
-    def pprint(self):
-        print('-------------------------------------------------------')
-        print('Weights for desired portfolio ( w/o risk free )        ')
-        print('-------------------------------------------------------')
-        for i, j in enumerate(zip(self.data, self.marko.w), 1):
-            print('{:2} : {:6s} --> {:.6f}'.format(i, j[0], j[1]))
-        print('-------------------------------------------------------')
+    def pprint(self, show_marko=True, show_capm=True):
+        if show_marko:
+            print('-----------------------------------------------------------------------------------')
+            print('Weights for desired portfolio ( w/o risk free ) | Markowitz Theory                 ')
+            print('-----------------------------------------------------------------------------------')
+            for i, j in enumerate(zip(self.data, self.marko.w), 1):
+                print('{:2} : {:10s} --> {:.6f}'.format(i, j[0], j[1]))
+            print('-----------------------------------------------------------------------------------')
+            print('Observations: ')
+            print('1. For given return {:.2f}% minimum risk is {:.2f}%'.format(self.marko.ret*100, self.marko.risk*100))
+            print()
+
+        if show_capm:
+            print('-----------------------------------------------------------------------------------')
+            print('Weights for desired portfolio ( with risk free ) | Capital Assets Pricing Model    ')
+            print('-----------------------------------------------------------------------------------')
+            print('{:2} : {:10s} --> {:.6f}'.format(1, 'Risk Free', self.capm.w_risk_free))
+            for i, j in enumerate(zip(self.data, self.capm.w_risky), 2):
+                print('{:2} : {:10s} --> {:.6f}'.format(i, j[0], j[1]))
+            print('-----------------------------------------------------------------------------------')
+            print('Observations: ')
+            print('1. For given return {:.2f}% minimum risk is {:.2f}%'.format(self.capm.ret * 100, self.capm.risk * 100))
+            print('2. In given portfolio for {:.2f}% return obtained by market while, '.format(self.capm.ret_risky))
+            print('   {:.2f}% return obtained by risk free assets'.format(self.capm.ret - self.capm.ret_risky))
+            print('3. μ = {:.3f} σ + {:.3f}'.format(self.capm.slope, self.capm.RR))
