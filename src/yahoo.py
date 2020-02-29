@@ -14,7 +14,6 @@ from datetime import date
 from urllib import request
 from utils import log
 
-
 CSV_CACHE_FOLDER = '../yahoodata'
 
 
@@ -54,7 +53,7 @@ class YahooFinanceData:
             file_name = '{}_{}_{}_{}.csv'.format(dname, self.period1, self.period2, self.interval)
             file_path = os.path.join(CSV_CACHE_FOLDER, file_name)
             error = None
-            
+
             # find in cache first
             if os.path.isfile(file_path):
                 log('{} : Found in cache'.format(dname), 2)
@@ -96,7 +95,7 @@ class YahooFinanceData:
 
             crumb = request.quote(crumb)
 
-            # Download URL 
+            # Download URL
             urld = self.urldown.format(dname)
             urlargs = list()
             urlargs.append('period2={}'.format(self.period2))
@@ -120,13 +119,13 @@ class YahooFinanceData:
             if error:
                 log('{} : {}'.format(dname, error), 2)
                 continue
-        
+
             log('{} : Downloaded and stored in cache'.format(dname), 2)
             with open(file_path, 'w') as f:
                 f.write(stock_data)
-            
+
             required.remove(dname)
-        
+
         if len(required):
             raise ValueError("Not all stocks are downloaded")
 
