@@ -3,8 +3,16 @@ import cvxpy as cp
 import pandas as pd
 
 
+VERBOSITY = 1
+
+
+def log(msg, verbosity=1):
+    if verbosity <= VERBOSITY:
+        print(msg)
+
+
 def mean_and_cov_matrix(data):
-    # Returns and covriance matrix
+    # Returns and covariance matrix
     M = []
     C = []
 
@@ -28,7 +36,7 @@ def mean_and_cov_matrix(data):
     M = np.array(M)
     C = np.array(C)
 
-    return  M, C
+    return M, C
 
 
 def solvePortfolio(cov_matrix, mean_matrix, expected_mean=None):
