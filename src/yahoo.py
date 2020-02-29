@@ -11,6 +11,7 @@ import requests
 import os
 import pandas as pd
 from datetime import date
+from urllib import parse
 
 
 CSV_CACHE_FOLDER = '../yahoodata'
@@ -97,6 +98,8 @@ class YahooFinanceData:
                 stock_data = None
                 continue
 
+            crumb = parse.quote(crumb)
+
             # Download URL 
             urld = self.urldown.format(dname)
             urlargs = []
@@ -111,10 +114,10 @@ class YahooFinanceData:
                 resp = self.sess.get(urld, **self.sesskwargs)
                 if resp.status_code != requests.codes.ok:
                     continue
-                ctype = resp.headers['Content-Type']
-                if 'text/csv' not in ctype:
-                    error = 'Wrong content type: %s' % ctype
-                    continue  # HTML returned? wrong url?
+                # ctype = resp.headers['Content-Type']
+                # if 'text/csv' not in ctype:
+                #     error = 'Wrong content type: %s' % ctype
+                #     continue  # HTML returned? wrong url?
                 stock_data = resp.text
                 break
 
