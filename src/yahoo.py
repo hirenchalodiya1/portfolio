@@ -11,7 +11,8 @@ import requests
 import os
 import pandas as pd
 from datetime import date
-from urllib import parse
+from urllib import request
+from utils import log
 
 
 CSV_CACHE_FOLDER = '../yahoodata'
@@ -38,7 +39,7 @@ class YahooFinanceData:
         self.retries = 4
 
         # finance data
-        self.data = {}
+        self.data = dict()
 
         # cache data folder
         if not os.path.isdir(CSV_CACHE_FOLDER):
@@ -56,11 +57,7 @@ class YahooFinanceData:
             
             # find in cache first
             if os.path.isfile(file_path):
-                print('{} found in cache'.format(dname))
-                
-                with open(file_path) as f:
-                    stock_data = f.read()
-                
+                log('{} : Found in cache'.format(dname), 2)
                 required.remove(dname)
                 continue
 
@@ -93,16 +90,15 @@ class YahooFinanceData:
                 break
 
             if crumb is None:
-                error = 'crumb not found'
-                print('{} {}'.format(dname, error))
-                stock_data = None
+                error = 'Crumb not found'
+                log('{} : {}'.format(dname, error), 2)
                 continue
 
-            crumb = parse.quote(crumb)
+            crumb = request.quote(crumb)
 
             # Download URL 
             urld = self.urldown.format(dname)
-            urlargs = []
+            urlargs = list()
             urlargs.append('period2={}'.format(self.period2))
             urlargs.append('period1={}'.format(self.period1))
             urlargs.append('interval={}'.format(self.interval))
@@ -122,17 +118,17 @@ class YahooFinanceData:
                 break
 
             if error:
-                print('{} {}'.format(dname, error))
+                log('{} : {}'.format(dname, error), 2)
                 continue
         
-            print('{} downloaded and stored in cache'.format(dname))
+            log('{} : Downloaded and stored in cache'.format(dname), 2)
             with open(file_path, 'w') as f:
                 f.write(stock_data)
             
             required.remove(dname)
         
         if len(required):
-            raise ValueError("Not all stockes are downloaded")
+            raise ValueError("Not all stocks are downloaded")
 
         self._update()
 
@@ -141,3 +137,4 @@ class YahooFinanceData:
             file_name = '{}_{}_{}_{}.csv'.format(dname, self.period1, self.period2, self.interval)
             file_path = os.path.join(CSV_CACHE_FOLDER, file_name)
             self.data[dname] = pd.read_csv(file_path)['Close']
+        self.data = pd.DataFrame(self.data)
