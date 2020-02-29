@@ -115,6 +115,8 @@ class MarkowitzBullet:
         # Restrict graph point
         if gp is None:
             gp = int(self.gp_point / 100 * len(self.line_mu))
+        else:
+            gp = int(gp / 100 * len(self.line_mu))
 
         # Bullet line
         ax.plot(self.line_sigma[:gp], self.line_mu[:gp], label='μ vs σ : Markowitz bullet')
