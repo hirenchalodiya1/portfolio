@@ -110,29 +110,30 @@ class MarkowitzBullet:
         lambda2 = (expected_mean * self._e - self._f) / denominator
         return lambda1 + lambda2
 
-    def plot(self, ax):
+    def plot(self, ax, line_only=False):
         # Bullet line
         ax.plot(self.line_sigma, self.line_mu, label='μ vs σ : Markowitz bullet')
-
-        # Market  point
-        ax.plot(self.risk, self.ret, label='Optimal point for given μ', marker="o")
-
-        # Lowest point
-        ax.plot(self.risk_min, self.ret_min, marker="o")
 
         # Fill frontier
         ax.fill_between(self.line_sigma, self.ret_min, self.line_mu, where=self.line_mu >= self.ret_min,
                         color='#8FE388', label='Efficient frontier')
 
-        # Add a title
-        ax.set_title('Markowitz bullet')
+        # Lowest point
+        ax.plot(self.risk_min, self.ret_min, marker="o")
 
-        # Add X and y Label
-        ax.set_xlabel('σ axis')
-        ax.set_ylabel('μ axis')
+        if not line_only:
+            # Market  point
+            ax.plot(self.risk, self.ret, label='Optimal point for given μ', marker="o")
 
-        # Add a grid
-        ax.grid(alpha=.4, linestyle=':')
+            # Add a title
+            ax.set_title('Markowitz bullet')
 
-        # Add a Legend
-        ax.legend(prop={"size": 7})
+            # Add X and y Label
+            ax.set_xlabel('σ axis')
+            ax.set_ylabel('μ axis')
+
+            # Add a grid
+            ax.grid(alpha=.4, linestyle=':')
+
+            # Add a Legend
+            ax.legend(prop={"size": 7})
