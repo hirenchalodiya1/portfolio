@@ -35,5 +35,5 @@ data.prepare()
 
 # Let engine handle rest of it !!
 engine = PyfolioEngine(data.data, 0.2, 0.0633, marko={'mu_max': 1.5, 'gp_point': 70}, cap={'compare_point': 0.15})
-engine.plot(show_marko=False, show_capm=True)
+engine.plot(show_marko=True, show_capm=True)
 engine.pprint(show_marko=True, show_capm=True)
