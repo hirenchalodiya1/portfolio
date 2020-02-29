@@ -9,6 +9,7 @@ requests = "*"
 pandas = "*"
 numpy = "*"
 cvxpy = "*"
+flake8 = "*"
 
 [dev-packages]
 
