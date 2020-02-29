@@ -27,22 +27,45 @@ class PyfolioEngine:
         cap = kwargs.get('cap', dict())
         self.capm = CAPM(self.ret_matrix, self.cov_matrix, expected_mean, risk_free_return, **cap)
 
-    def plot(self):
-        # Figure
-        fig = plt.figure()
-        fig.canvas.set_window_title('Portfolio optimization')
+    def plot(self, show_marko=True, show_capm=True):
+        """
+        fig1: Markowitz bullet Figure
+        fig2: Capital market line
+        """
+        # Part 1
+        if show_marko:
+            # Figure
+            fig1 = plt.figure()
+            fig1.canvas.set_window_title('Markowitz bullet')
 
-        # Grid
-        gs = gd.GridSpec(1, 2, figure=fig)
+            # Grid
+            gs1 = gd.GridSpec(1, 1, figure=fig1)
 
-        # Markowitz bullet
-        ax1 = fig.add_subplot(gs[0, :1])
-        self.marko.plot(ax1)
+            # plot
+            ax1 = fig1.add_subplot(gs1[:, :])
+            self.marko.plot(ax1)
 
-        # Capital Assets Pricing Model
-        ax2 = fig.add_subplot(gs[0, 1:])
-        self.marko.plot(ax2, line_only=True)
-        self.capm.plot(ax2)
+        if show_capm:
+            # Part 2
+            # Figure
+            fig2 = plt.figure()
+            fig2.canvas.set_window_title('Capital assets pricing model')
+
+            # Grid
+            gs2 = gd.GridSpec(1, 1, figure=fig2)
+
+            # plot
+            ax2 = fig2.add_subplot(gs2[:, :])
+            self.marko.plot(ax2, gp=100, line_only=True)
+            self.capm.plot(ax2)
 
         # Show plot
         plt.show()
+
+    def pprint(self):
+        print('-------------------------------------------------------')
+        print('Weights for desired portfolio ( w/o risk free )        ')
+        print('-------------------------------------------------------')
+        for i, j in enumerate(zip(self.data, self.marko.w), 1):
+            print('{:2} : {:6s} --> {:.6f}'.format(i, j[0], j[1]))
+        print('-------------------------------------------------------')
