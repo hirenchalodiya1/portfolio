@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from markovitz import MarkowitzBullet
 from capm import CAPM
+from betas import Betas
 
 
 class PyfolioEngine:
@@ -23,9 +24,12 @@ class PyfolioEngine:
         marko = kwargs.get('marko', dict())
         self.marko = MarkowitzBullet(self.ret_matrix, self.cov_matrix, expected_mean, **marko)
 
-        # capital assets pricing model
+        # Capital assets pricing model
         cap = kwargs.get('cap', dict())
         self.capm = CAPM(self.ret_matrix, self.cov_matrix, expected_mean, risk_free_return, **cap)
+
+        # Betas
+        self.betas = Betas(self.ret_matrix, self.capm.ret_risky, risk_free_return)
 
     def plot(self, show_marko=True, show_capm=True):
         """
@@ -62,7 +66,7 @@ class PyfolioEngine:
         # Show plot
         plt.show()
 
-    def pprint(self, show_marko=True, show_capm=True):
+    def pprint(self, show_marko=True, show_capm=True, show_beta=True):
         if show_marko:
             print('-----------------------------------------------------------------------------------')
             print('Weights for desired portfolio ( w/o risk free ) | Markowitz Theory                 ')
@@ -87,3 +91,11 @@ class PyfolioEngine:
             print('2. In given portfolio for {:.2f}% return obtained by market while, '.format(self.capm.ret_risky))
             print('   {:.2f}% return obtained by risk free assets'.format(self.capm.ret - self.capm.ret_risky))
             print('3. μ = {:.3f} σ + {:.3f}'.format(self.capm.slope, self.capm.RR))
+
+        if show_beta:
+            print('-----------------------------------------------------------------------------------')
+            print('List of betas for all the stocks                                                   ')
+            print('-----------------------------------------------------------------------------------')
+            for i, j in enumerate(zip(self.data, self.betas.betas), 1):
+                print('{:2} : {:10s} --> {:.6f}'.format(i, j[0], j[1]))
+            print('-----------------------------------------------------------------------------------')
