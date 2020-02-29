@@ -30,6 +30,7 @@ class MarkowitzBullet:
         self.mu_min = kwargs.get('mu_min', 0.00)
         self.mu_max = kwargs.get('mu_max', 0.50)
         self.mu_gap = kwargs.get('mu_gap', 0.005)
+        self.gp_point = kwargs.get('gp_point', 70)
 
         # Prepare matrices
         identity = [1] * self.n
@@ -57,9 +58,9 @@ class MarkowitzBullet:
         self.risk = None
 
         # Prepare lines
-        self.prepare()
+        self._prepare()
 
-    def prepare(self):
+    def _prepare(self):
         mu_range = np.arange(self.mu_min, self.mu_max, self.mu_gap)  # mu_range : mu range
 
         # sg = lambda mu: cp.quad_form(solvePortfolio(self.CM, self.MM, mu), self.CM).value  # sg : sigma generator
@@ -110,12 +111,16 @@ class MarkowitzBullet:
         lambda2 = (expected_mean * self._e - self._f) / denominator
         return lambda1 + lambda2
 
-    def plot(self, ax, line_only=False):
+    def plot(self, ax, gp=None, line_only=False):
+        # Restrict graph point
+        if gp is None:
+            gp = int(self.gp_point / 100 * len(self.line_mu))
+
         # Bullet line
-        ax.plot(self.line_sigma, self.line_mu, label='μ vs σ : Markowitz bullet')
+        ax.plot(self.line_sigma[:gp], self.line_mu[:gp], label='μ vs σ : Markowitz bullet')
 
         # Fill frontier
-        ax.fill_between(self.line_sigma, self.ret_min, self.line_mu, where=self.line_mu >= self.ret_min,
+        ax.fill_between(self.line_sigma[:gp], self.ret_min, self.line_mu[:gp], where=self.line_mu[:gp] >= self.ret_min,
                         color='#8FE388', label='Efficient frontier')
 
         # Lowest point
