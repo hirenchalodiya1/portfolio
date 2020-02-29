@@ -1,5 +1,4 @@
 import numpy as np
-import cvxpy as cp
 
 
 class CAPM:
@@ -9,92 +8,63 @@ class CAPM:
     EM : Expected Mean
     RR : Risk free return
     n : Number of stocks
-    
-    w : weightage for market point
-    risk : min risk for given mean
-    ret: given mean
 
-    w_min : min weightage for sigma mean
-    var_mean : min variance
-    ret_mean : return fot min variance
-
-    line_mean : 
-    line_var: 
+    w_risk_free : weightage for market point
+    w_risky : min risk for given mean
+    ret : given mean
+    ret_risky ; return of risky assets
+    risk : risk of portfolio
     """
-    def __init__(self, MM, CM, EM, RR, **kwargs):
+
+    def __init__(self, mean_matrix, covariance_matrix, expected_mean, risk_free_return, **kwargs):
         # Stocks data
-        self.MM = MM
-        self.RR = RR
-        self.CM = CM
-        self.EM = EM
-        self.n = len(self.MM)        
-        
-        # Curve properties
-        self.mu_min = kwargs.get('mu_min', 0.00)
-        self.mu_max = kwargs.get('mu_max', 0.50)
-        self.mu_gap = kwargs.get('mu_gap', 0.005)
-        
-        # Prepate lines
-        self.prepare()
+        self.MM = mean_matrix
+        self.RR = risk_free_return
+        self.CM = covariance_matrix
+        self.EM = expected_mean
+        self.n = len(self.MM)
 
-    def prepare(self):
-        mu_range = np.arange( self.mu_min, self.mu_max, self.mu_gap)  # mu_range : mu range
-        wg = lambda mu: self.solveSub(mu)[0] # wg : wrisky generator
-        sg = lambda w: cp.quad_form(w, self.CM).value  # sg : sigma generator
-        mg = lambda w: (self.MM @ w.T)
+        # Prepare matrices
+        identity = [1] * self.n
+        self.CI = np.linalg.inv(self.CM)  # C inverse
+        self.Identity = np.array(identity)
 
-        mu = []
-        sigma = []
-        
-        for m in mu_range:
-            try:
-                w = wg(m)
-                sigma.append(sg(w))
-                mu.append(mg(w))
-            except cp.error.DCPError:
-                pass
+        # Optimal point ( Capital Market point )
+        self.w_risk_free = None
+        self.w_risky = None
+        self.ret = None
+        self.ret_risky = None
+        self.risk = None
 
-        if not len(mu):
-            raise ValueError('Data are not proper')
+        # Derived portfolio ( Market point )
+        self.ret_der = None
+        self.risk_der = None
 
-        self.mu_min = max(self.mu_min, mu[0])
-        self.mu_max = min(self.mu_max, mu[-1])
+        # Prepare lines
+        self._prepare()
 
-        # variance and mean line
-        self.line_mean = np.array(mu)
-        self.line_var = np.array(sigma)
+    def _prepare(self):
+        # Ideal market portfolio
 
-        # minimum variable
-        self.w_min, self.wr_min = self.solveSub()
-        self.risk_min = cp.quad_form(self.w_min, self.CM).value
-        self.ret_min = (self.MM @ self.w_min.T) + self.RR * self.wr_min
+        # Market point
+        _a = (self.MM - self.RR * self.Identity) @ self.CI
+        w_der = _a / (_a @ self.Identity.T)
+        self.ret_der = self.MM @ w_der.T
+        self.risk_der = np.sqrt(w_der @ self.CM @ w_der.T)
 
-        # Solve problem
-        if not self.mu_min <= self.EM <= self.mu_max:
-            raise ValueError('Return is not in range')
+        # Optimal point ( Capital Market point )
+        self.ret = self.EM
 
-        self.w, self.wr = self.solveSub(self.EM)
-        self.risk = cp.quad_form(self.w, self.CM).value
-        self.ret = self.EM + + self.RR * self.wr
+        w_risky_sum = (self.ret - self.RR) / (self.ret_der - self.RR)
+        self.w_risky = w_risky_sum * w_der
+        self.w_risk_free = 1 - w_risky_sum
+        self.ret_risky = self.w_risky @ self.MM.T
+        self.risk = w_risky_sum * self.risk_der
 
-    def solveSub(self, EM=None):
-        wr = cp.Variable(self.n) # w risky
-        wrf = cp.Variable(1) # w risk-free
-
-        risk = cp.quad_form(wr, self.CM)
-        conditions = [
-            sum(wr + wrf) == 1,
-            self.MM @ wr.T + self.RR * wrf == EM
-        ]
-        if EM is None:
-            conditions = [
-                sum(wr + wrf) == 1
-            ]
-        
-        prob = cp.Problem(cp.Minimize(risk), conditions)
-        prob.solve()
-        # print(np.array(wr.value), np.array(wrf.value))
-        return np.array(wr.value), np.array(wrf.value)
+        # Capital market line
+        self.capm_risk = np.arange(0, self.risk_der * 1.5, 0.02)
+        slope = (self.ret_der - self.RR) / self.risk_der
+        self.capm_ret = (slope * self.capm_risk) + self.RR
 
     def plot(self, ax):
         # x axis
@@ -103,27 +73,23 @@ class CAPM:
         # y axis
         ax.axvline(color='#000000')
 
-        # Bullet line
-        ax.plot(self.line_var, self.line_mean, label='μ vs σ : Markowitz bullet')
+        # Capital Market line
+        ax.plot(self.capm_risk, self.capm_ret, label='Capital Market line')
 
-        # Market  point        
-        ax.plot(self.risk, self.ret, label='Min σ for given μ', marker="o")
+        # Risk free point
+        ax.plot(0, self.RR, label='Risk free point', marker="o")
 
-        # Lowest point
-        ax.plot(self.risk_min, self.ret_min, marker="o")
+        # Market point
+        ax.plot(self.risk_der, self.ret_der, label='Market point', marker="o")
 
-        # Fill frontier
-        ax.fill_between(self.line_var, self.ret_min, self.line_mean, where=self.line_mean >= self.ret_min,  color='#8FE388', label='Efficient frontier')
+        # Capital Market point
+        ax.plot(self.risk, self.ret, label="Capital Market point", marker='o')
 
         # Add a title
         ax.set_title('Capital assets pricing model')
 
-        # Add X and y Label
-        ax.set_xlabel('σ axis')
-        ax.set_ylabel('μ axis')
-
         # Add a grid
-        ax.grid(alpha=.4,linestyle=':')
+        ax.grid(alpha=.4, linestyle=':')
 
         # Add a Legend
-        ax.legend(prop={"size":7})
+        ax.legend(prop={"size": 7})
