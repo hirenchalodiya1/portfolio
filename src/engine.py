@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from markovitz import MarkowitzBullet
 from capm import CAPM
-from betas import Betas
+from betas import Betas, NewBetas
 
 
 class PyfolioEngine:
@@ -34,12 +34,25 @@ class PyfolioEngine:
         # We use derived portfolio value so we need to devied ret_risky and w_risky by sum(w_risky)
         market_weights = pd.DataFrame(pd.Series(self.capm.w_risky / sum(self.capm.w_risky), index=data.keys()))
         daily_return_of_market = (returns_daily * market_weights[0]).sum(1)
-        self.betas = Betas(
-                        returns_daily,
-                        daily_return_of_market,
-                        self.capm.ret_risky / sum(self.capm.w_risky),
-                        risk_free_return,
-                        self.ret_matrix)
+
+        # Prepare new betas
+        new_returns = kwargs.get('new', {}).get('data', {})
+        new_returns_daily = new_returns.pct_change()
+        self.new_betas = NewBetas(new_returns_daily, daily_return_of_market, risk_free_return)
+        _b = self.new_betas.betas.values()
+        if not _b:
+            _b_max = 1
+            _b_min = 0
+        else:
+            _b_max = max(_b)
+            _b_min = min(_b)
+
+        # First calculate new beta so that graph can ploted nicely
+        self.betas = Betas(returns_daily,
+                           daily_return_of_market,
+                           self.capm.ret_risky / sum(self.capm.w_risky),
+                           risk_free_return,
+                           self.ret_matrix, beta_max=_b_max, beta_min=_b_min)
 
     def plot(self, show_marko=True, show_capm=True, show_beta=True):
         """
@@ -85,6 +98,7 @@ class PyfolioEngine:
             # plot
             ax3 = fig3.add_subplot(gs3[:, :])
             self.betas.plot(ax3)
+            self.new_betas.plot(ax3)
 
         # Show plot
         plt.show()
@@ -98,7 +112,7 @@ class PyfolioEngine:
                 print('{:2} : {:10s} --> {:10.6f}'.format(i, j[0], j[1]))
             print('-----------------------------------------------------------------------------------')
             print('Observations: ')
-            print('1. For given return {:.2f}% minimum risk is {:.2f}%'.format(self.marko.ret*100, self.marko.risk*100))
+            print('1. For given return {:.2f}% minimum risk is {:.2f}%'.format(self.marko.ret * 100, self.marko.risk * 100))
             print()
 
         if show_capm:
@@ -112,7 +126,7 @@ class PyfolioEngine:
             print('Observations: ')
             print('1. For given return {:.2f}% minimum risk is {:.2f}%'.format(self.capm.ret * 100, self.capm.risk * 100))
             print('2. In given portfolio for {:.2f}% return obtained by market while, '.format(self.capm.ret_risky * 100))
-            print('   {:.2f}% return obtained by risk free assets'.format((self.capm.ret - self.capm.ret_risky)*100))
+            print('   {:.2f}% return obtained by risk free assets'.format((self.capm.ret - self.capm.ret_risky) * 100))
             print('3. μ = {:.3f} σ + {:.3f}'.format(self.capm.slope, self.capm.RR))
 
         if show_beta:
