@@ -7,7 +7,7 @@ class Betas:
         self.betas = dict()
 
         market_variance = returns_of_market.var()
-        
+
         # calculating betas by analysing daily market data
         for stock, returns in returns_of_stocks.items():
             beta = returns_of_market.cov(returns)/market_variance
@@ -34,7 +34,7 @@ class Betas:
 
         # SML Line
         ax.plot([self._min_beta, self._max_beta], [self.line_sml(self._min_beta), self.line_sml(self._max_beta)], label='SML')
-        
+
         for mean, beta in zip(self.MM, self.betas.values()):
             ax.plot(beta, mean, marker='o')
 
