@@ -20,7 +20,7 @@ def mean_and_cov_matrix(data):
         ret_matrix = []
         zero_value = value[0]
         for val in value:
-            ret_matrix.append((val-zero_value)/zero_value)
+            ret_matrix.append((val - zero_value) / zero_value)
         data[key] = pd.Series(ret_matrix)
 
     for key1, value1 in data.items():
