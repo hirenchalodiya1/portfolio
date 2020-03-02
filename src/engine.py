@@ -86,7 +86,6 @@ class PyfolioEngine:
             ax3 = fig3.add_subplot(gs3[:, :])
             self.betas.plot(ax3)
 
-
         # Show plot
         plt.show()
 
