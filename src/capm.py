@@ -75,7 +75,7 @@ class CAPM:
         # Comparison line
         self.line_comp = [0, (self.slope * self.com_point + self.RR) * 1.5]
 
-    def plot(self, ax):
+    def plot(self, ax, cmp_line=False):
         # x axis
         ax.axhline(color='#000000')
 
@@ -95,11 +95,12 @@ class CAPM:
         ax.plot(self.risk, self.ret, label="Capital Market point", marker='o')
 
         # Comparision of risk
-        ax.plot([self.com_point, self.com_point], self.line_comp, color='#013220', linestyle='--',
-                label='Comparison line')
+        if cmp_line:
+            ax.plot([self.com_point, self.com_point], self.line_comp, color='#013220', linestyle='--',
+                    label='Comparison line')
 
         # Add a title
-        ax.set_title('Capital assets pricing model')
+        ax.set_title('Capital Assets Pricing Model')
 
         # Add a grid
         ax.grid(alpha=.4, linestyle=':')

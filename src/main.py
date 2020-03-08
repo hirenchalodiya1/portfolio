@@ -24,19 +24,19 @@ stock_code = [
     'MA',  # mastercard
     'TCS.NS',
     'SQ',
-    'CODX',
     'TDOC',
-    'IBIO',
     'PYPL',
+    'BAC',
+    '^NSEBANK',
 ]
 new_stocks = [
-    # 'RELIANCE.NS',
-    # 'GC=F',
-    # 'ITUB',
-    # 'SBIN.NS',
-    # 'ICICIBANK.NS',
-    # '^NSEBANK',
-    # 'BAC',
+    'RELIANCE.NS',
+    'CODX',
+    'IBIO',
+    'GC=F',
+    'ITUB',
+    'SBIN.NS',
+    'ICICIBANK.NS',
 ]
 x = set(new_stocks) & set(stock_code)
 if x:

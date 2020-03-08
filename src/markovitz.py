@@ -111,7 +111,7 @@ class MarkowitzBullet:
         lambda2 = (expected_mean * self._e - self._f) / denominator
         return lambda1 + lambda2
 
-    def plot(self, ax, gp=None, line_only=False):
+    def plot(self, ax, gp=None, line_only=False, individual=False):
         # Restrict graph point
         if gp is None:
             gp = int(self.gp_point / 100 * len(self.line_mu))
@@ -131,6 +131,11 @@ class MarkowitzBullet:
         if not line_only:
             # Market  point
             ax.plot(self.risk, self.ret, label='Optimal point for given μ', marker="o")
+
+            # Individual points
+            if individual:
+                for i in range(self.n):
+                    ax.plot(self.CM[i][i], self.MM[i], marker='o')
 
             # Add a title
             ax.set_title('Markowitz bullet')

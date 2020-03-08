@@ -5,6 +5,7 @@ import pandas as pd
 from markovitz import MarkowitzBullet
 from capm import CAPM
 from betas import Betas, NewBetas
+from joint import capm_and_betas
 
 
 class PyfolioEngine:
@@ -54,7 +55,7 @@ class PyfolioEngine:
                            risk_free_return,
                            self.ret_matrix, beta_max=_b_max, beta_min=_b_min)
 
-    def plot(self, show_marko=True, show_capm=True, show_beta=True):
+    def plot(self, show_marko=True, show_capm=True, show_beta=True, joint=True):
         """
         fig1: Markowitz bullet Figure
         fig2: Capital market line
@@ -84,7 +85,7 @@ class PyfolioEngine:
             # plot
             ax2 = fig2.add_subplot(gs2[:, :])
             self.marko.plot(ax2, gp=100, line_only=True)
-            self.capm.plot(ax2)
+            self.capm.plot(ax2, cmp_line=True)
 
         if show_beta:
             # Part 3
@@ -99,6 +100,14 @@ class PyfolioEngine:
             ax3 = fig3.add_subplot(gs3[:, :])
             self.betas.plot(ax3)
             self.new_betas.plot(ax3)
+
+        if joint:
+            fig4 = plt.figure()
+            fig4.canvas.set_window_title('CML and SML')
+            gs4 = gd.GridSpec(1, 2, figure=fig4)
+            ax4, ax5 = fig4.subplots(1, 2, sharey=True)
+            # ax5 = fig4.add_subplot(gs4[:, 1:])
+            capm_and_betas(self.marko, self.capm, self.betas, ax4, ax5)
 
         # Show plot
         plt.show()
