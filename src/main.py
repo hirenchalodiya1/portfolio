@@ -31,8 +31,8 @@ stock_code = [
 ]
 new_stocks = [
     'RELIANCE.NS',
-    'CODX',
-    'IBIO',
+    # 'CODX',
+    # 'IBIO',
     'GC=F',
     'ITUB',
     'SBIN.NS',
@@ -53,4 +53,4 @@ new_data.prepare()
 engine = PyfolioEngine(data.data, 0.2, 0.0633, marko={'mu_max': 1.5, 'gp_point': 70}, cap={'compare_point': 0.15},
                        new={'data': new_data.data})
 engine.plot(show_marko=True, show_capm=True, show_beta=True)
-engine.pprint(show_marko=True, show_capm=True, show_beta=True)
+engine.pprint(show_marko=0, show_capm=0, show_beta=0)

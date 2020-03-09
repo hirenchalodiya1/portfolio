@@ -107,7 +107,7 @@ class PyfolioEngine:
             gs4 = gd.GridSpec(1, 2, figure=fig4)
             ax4, ax5 = fig4.subplots(1, 2, sharey=True)
             # ax5 = fig4.add_subplot(gs4[:, 1:])
-            capm_and_betas(self.marko, self.capm, self.betas, ax4, ax5)
+            capm_and_betas(self.marko, self.capm, self.betas, self.new_betas, ax4, ax5)
 
         # Show plot
         plt.show()

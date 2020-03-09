@@ -57,6 +57,7 @@ class NewBetas:
         self.RR = risk_free_return
         self.MR = returns_of_market.mean() * 250
         self.MM = returns_of_stocks.mean() * 250
+        self.VM = returns_of_stocks.var() * 250
 
         self.betas = dict()
 
